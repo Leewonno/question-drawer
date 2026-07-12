@@ -1,0 +1,45 @@
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { renderHook, act } from '@testing-library/react';
+import { useFreshItemId, FRESH_MS } from './useFreshItemId';
+import type { DrawerItem } from '@/src/lib/schema';
+
+function item(createdAt: number): DrawerItem {
+  return {
+    id: 'a1',
+    selectedText: 'side effect',
+    question: 'side effect에 대해 자세히 설명해줘',
+    site: 'claude',
+    createdAt,
+  };
+}
+
+describe('useFreshItemId', () => {
+  beforeEach(() => vi.useFakeTimers());
+  afterEach(() => vi.useRealTimers());
+
+  it('returns null when there is no item', () => {
+    const { result } = renderHook(() => useFreshItemId(undefined));
+    expect(result.current).toBeNull();
+  });
+
+  it('highlights an item that was just added', () => {
+    const { result } = renderHook(() => useFreshItemId(item(Date.now())));
+    expect(result.current).toBe('a1');
+  });
+
+  it('stops highlighting after the freshness window elapses', () => {
+    const { result } = renderHook(() => useFreshItemId(item(Date.now())));
+    expect(result.current).toBe('a1');
+
+    act(() => {
+      vi.advanceTimersByTime(FRESH_MS + 1);
+    });
+
+    expect(result.current).toBeNull();
+  });
+
+  it('does not highlight an item stored in a previous session', () => {
+    const { result } = renderHook(() => useFreshItemId(item(Date.now() - FRESH_MS - 1)));
+    expect(result.current).toBeNull();
+  });
+});
