@@ -1,1 +1,22 @@
 @import "tailwindcss";
+
+/* The drawer lives in a shadow root, so Tailwind's default `dark:` variant
+   (prefers-color-scheme) would follow the OS instead of the host page. Bind it
+   to a class we set from useHostTheme() on the shadow root's top wrapper. */
+@custom-variant dark (&:where(.qd-dark, .qd-dark *));
+
+@theme {
+  --color-qd-panel: #fdf9ee;
+  --color-qd-panel-dark: #1b1a17;
+  --color-qd-card: #ffffff;
+  --color-qd-card-dark: #26241f;
+  --color-qd-fresh: #fef6e0;
+  --color-qd-fresh-dark: #33291a;
+  --color-qd-line: #f0e3c4;
+  --color-qd-line-dark: #3b3529;
+  --color-qd-accent: #d97706;
+  --color-qd-ink: #2b2620;
+  --color-qd-ink-dark: #ede8df;
+  --color-qd-muted: #8b8172;
+  --color-qd-muted-dark: #9c9384;
+}
