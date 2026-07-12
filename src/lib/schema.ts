@@ -5,6 +5,9 @@ export const DrawerItemSchema = z.object({
   selectedText: z.string(),
   question: z.string(),
   site: z.enum(['claude', 'chatgpt']),
+  // null = captured on a fresh chat that has no id yet; adopt() attaches one
+  // as soon as the URL grows a conversation id.
+  conversationId: z.string().nullable(),
   createdAt: z.number(),
 });
 

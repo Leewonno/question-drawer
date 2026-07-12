@@ -11,12 +11,15 @@ describe('DrawerPanel', () => {
   beforeEach(() => {
     fakeBrowser.reset();
     document.documentElement.classList.remove(DOCK_CLASS);
+    // The tests below store items with no conversation id, so they need a URL
+    // with none either. Keeps the isolation test at the bottom from leaking.
+    history.replaceState(null, '', '/');
   });
 
   it('renders stored questions and fires onItemClick', async () => {
-    await drawerStorage.add(createDrawerItem('side effect', 'claude'));
+    await drawerStorage.add(createDrawerItem('side effect', 'claude', null));
     const onItemClick = vi.fn();
-    render(<DrawerPanel onItemClick={onItemClick} />);
+    render(<DrawerPanel site="claude" onItemClick={onItemClick} />);
 
     const item = await screen.findByText('side effect에 대해 자세히 설명해줘');
     await userEvent.click(item);
@@ -24,8 +27,8 @@ describe('DrawerPanel', () => {
   });
 
   it('removes an item when its delete button is clicked', async () => {
-    await drawerStorage.add(createDrawerItem('side effect', 'claude'));
-    render(<DrawerPanel onItemClick={() => {}} />);
+    await drawerStorage.add(createDrawerItem('side effect', 'claude', null));
+    render(<DrawerPanel site="claude" onItemClick={() => {}} />);
 
     await screen.findByText('side effect에 대해 자세히 설명해줘');
     await userEvent.click(screen.getByRole('button', { name: '삭제' }));
@@ -36,15 +39,15 @@ describe('DrawerPanel', () => {
   });
 
   it('counts the questions in the header', async () => {
-    await drawerStorage.add(createDrawerItem('side effect', 'claude'));
-    await drawerStorage.add(createDrawerItem('cleanup', 'claude'));
-    render(<DrawerPanel onItemClick={() => {}} />);
+    await drawerStorage.add(createDrawerItem('side effect', 'claude', null));
+    await drawerStorage.add(createDrawerItem('cleanup', 'claude', null));
+    render(<DrawerPanel site="claude" onItemClick={() => {}} />);
 
     expect(await screen.findByText('떠오른 질문 2개 · 클릭하면 바로 질문')).toBeInTheDocument();
   });
 
   it('shows the empty state when nothing is stored', async () => {
-    render(<DrawerPanel onItemClick={() => {}} />);
+    render(<DrawerPanel site="claude" onItemClick={() => {}} />);
 
     expect(
       await screen.findByText('답변에서 궁금한 부분을 드래그해 담아보세요'),
@@ -52,9 +55,9 @@ describe('DrawerPanel', () => {
   });
 
   it('lists the newest question first', async () => {
-    await drawerStorage.add({ ...createDrawerItem('older', 'claude'), createdAt: 1000 });
-    await drawerStorage.add({ ...createDrawerItem('newer', 'claude'), createdAt: 2000 });
-    render(<DrawerPanel onItemClick={() => {}} />);
+    await drawerStorage.add({ ...createDrawerItem('older', 'claude', null), createdAt: 1000 });
+    await drawerStorage.add({ ...createDrawerItem('newer', 'claude', null), createdAt: 2000 });
+    render(<DrawerPanel site="claude" onItemClick={() => {}} />);
 
     await screen.findByText('newer에 대해 자세히 설명해줘');
     const questions = screen
@@ -64,8 +67,19 @@ describe('DrawerPanel', () => {
     expect(questions[1]).toContain('older');
   });
 
+  it('hides questions captured in another conversation', async () => {
+    history.replaceState(null, '', '/c/chat-1');
+    await drawerStorage.add(createDrawerItem('elsewhere', 'claude', 'chat-2'));
+    render(<DrawerPanel site="claude" onItemClick={() => {}} />);
+
+    expect(
+      await screen.findByText('답변에서 궁금한 부분을 드래그해 담아보세요'),
+    ).toBeInTheDocument();
+    expect(screen.queryByText('elsewhere에 대해 자세히 설명해줘')).toBeNull();
+  });
+
   it('docks the page while open and undocks when collapsed', async () => {
-    render(<DrawerPanel onItemClick={() => {}} />);
+    render(<DrawerPanel site="claude" onItemClick={() => {}} />);
 
     await waitFor(() =>
       expect(document.documentElement.classList.contains(DOCK_CLASS)).toBe(true),

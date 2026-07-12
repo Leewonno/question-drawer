@@ -1,4 +1,4 @@
-import { test, expect, chromium, type BrowserContext } from '@playwright/test';
+import { test, expect, chromium, type BrowserContext, type Page } from '@playwright/test';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -32,9 +32,8 @@ test.afterAll(async () => {
   await context.close();
 });
 
-test('captures a selection and inserts the question', async () => {
-  const page = await context.newPage();
-  // The extension only matches claude.ai / chatgpt.com; route a fake chatgpt page.
+// The extension only matches claude.ai / chatgpt.com; route a fake chatgpt page.
+async function mountFixture(page: Page) {
   await page.route('*://chatgpt.com/**', (route) =>
     route.fulfill({
       contentType: 'text/html',
@@ -52,6 +51,11 @@ test('captures a selection and inserts the question', async () => {
       </body></html>`,
     }),
   );
+}
+
+test('captures a selection and inserts the question', async () => {
+  const page = await context.newPage();
+  await mountFixture(page);
   await page.goto('https://chatgpt.com/');
 
   await page.getByText('side effect').selectText();
@@ -84,4 +88,33 @@ test('captures a selection and inserts the question', async () => {
     .toBe(DRAWER_WIDTH_PX);
 
   await expect(page.locator('#prompt-textarea')).toContainText('side effect에 대해 자세히 설명해줘');
+});
+
+test('keeps questions scoped to the conversation they were captured in', async () => {
+  const page = await context.newPage();
+  await mountFixture(page);
+
+  // Capture inside conversation A.
+  await page.goto('https://chatgpt.com/c/conversation-a');
+  await page.getByText('side effect').selectText();
+  await page.dispatchEvent('body', 'mouseup');
+
+  const host = page.locator('question-drawer-ui');
+  await host.getByRole('button', { name: '서랍에 담기' }).click();
+  await expect(host.getByText('side effect에 대해 자세히 설명해줘')).toBeVisible();
+
+  // Conversation B never saw that question.
+  await page.goto('https://chatgpt.com/c/conversation-b');
+  await expect(
+    page.locator('question-drawer-ui').getByText('답변에서 궁금한 부분을 드래그해 담아보세요'),
+  ).toBeVisible();
+  await expect(
+    page.locator('question-drawer-ui').getByText('side effect에 대해 자세히 설명해줘'),
+  ).toHaveCount(0);
+
+  // Back in A, it is still there.
+  await page.goto('https://chatgpt.com/c/conversation-a');
+  await expect(
+    page.locator('question-drawer-ui').getByText('side effect에 대해 자세히 설명해줘'),
+  ).toBeVisible();
 });

@@ -7,6 +7,7 @@ export function buildQuestion(selectedText: string): string {
 export function createDrawerItem(
   selectedText: string,
   site: 'claude' | 'chatgpt',
+  conversationId: string | null,
 ): DrawerItem {
   const text = selectedText.trim();
   return {
@@ -14,6 +15,7 @@ export function createDrawerItem(
     selectedText: text,
     question: buildQuestion(text),
     site,
+    conversationId,
     createdAt: Date.now(),
   };
 }

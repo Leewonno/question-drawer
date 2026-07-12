@@ -32,6 +32,21 @@ export const drawerStorage = {
     const state = await read();
     await write({ items: state.items.filter((i) => i.id !== id) });
   },
+  // Items captured on a fresh chat have no conversation id yet. Once the URL
+  // grows one, they belong to that conversation.
+  async adopt(site: DrawerItem['site'], conversationId: string): Promise<void> {
+    const state = await read();
+    const pending = state.items.some(
+      (i) => i.site === site && i.conversationId === null,
+    );
+    // Skip the write so we don't wake every watcher for nothing.
+    if (!pending) return;
+    await write({
+      items: state.items.map((i) =>
+        i.site === site && i.conversationId === null ? { ...i, conversationId } : i,
+      ),
+    });
+  },
   watch(cb: (items: DrawerItem[]) => void): () => void {
     return storage.watch<unknown>(KEY, (raw) => {
       const parsed = DrawerStateSchema.safeParse(raw ?? EMPTY);

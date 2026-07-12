@@ -1,17 +1,21 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useDrawerItems } from './useDrawerItems';
+import { useConversationId } from './useConversationId';
 import { useFreshItemId } from './useFreshItemId';
 import { DrawerItemCard } from './DrawerItemCard';
 import { useHostTheme } from '@/src/lib/theme';
 import { applyDock, cleanupDock, DRAWER_WIDTH_PX } from '@/src/lib/dock';
+import type { SiteId } from '@/src/lib/site-adapter';
 import type { DrawerItem } from '@/src/lib/schema';
 
 interface Props {
+  site: SiteId;
   onItemClick: (item: DrawerItem) => void;
 }
 
-export function DrawerPanel({ onItemClick }: Props) {
-  const { items, remove } = useDrawerItems();
+export function DrawerPanel({ site, onItemClick }: Props) {
+  const conversationId = useConversationId();
+  const { items, remove } = useDrawerItems(site, conversationId);
   const [open, setOpen] = useState(true);
   const theme = useHostTheme();
 

@@ -9,6 +9,7 @@ function item(createdAt: number): DrawerItem {
     selectedText: 'side effect',
     question: 'side effect에 대해 자세히 설명해줘',
     site: 'claude',
+    conversationId: 'chat-1',
     createdAt,
   };
 }
