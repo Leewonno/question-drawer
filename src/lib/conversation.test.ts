@@ -1,8 +1,9 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
-import { getConversationId, watchConversationId } from './conversation';
+import { getConversationId, watchConversationId, POLL_MS } from './conversation';
 
 afterEach(() => {
   history.replaceState(null, '', '/');
+  vi.useRealTimers();
 });
 
 describe('getConversationId', () => {
@@ -38,55 +39,71 @@ describe('getConversationId', () => {
 });
 
 describe('watchConversationId', () => {
-  it('fires on pushState when the id changes', () => {
+  // The site's router lives in the page's main world, where our history patches
+  // would be invisible, so the URL can change with no event we can hook. Polling
+  // is what actually catches a chat switch.
+  it('notices a url the SPA swapped in without any event', () => {
+    vi.useFakeTimers();
     const cb = vi.fn();
     const stop = watchConversationId(cb);
 
     history.pushState(null, '', '/c/first');
+    expect(cb).not.toHaveBeenCalled(); // no event fires for pushState
+
+    vi.advanceTimersByTime(POLL_MS);
 
     expect(cb).toHaveBeenCalledWith('first');
     stop();
   });
 
-  it('fires on replaceState, which is how a new chat gains its id', () => {
+  it('notices a new chat gaining its id', () => {
+    vi.useFakeTimers();
+    history.replaceState(null, '', '/new');
     const cb = vi.fn();
     const stop = watchConversationId(cb);
 
     history.replaceState(null, '', '/c/fresh');
+    vi.advanceTimersByTime(POLL_MS);
 
     expect(cb).toHaveBeenCalledWith('fresh');
     stop();
   });
 
-  it('fires on popstate when the user goes back', async () => {
-    history.pushState(null, '', '/c/first');
+  it('fires on popstate without waiting for the next poll', () => {
+    vi.useFakeTimers();
     const cb = vi.fn();
     const stop = watchConversationId(cb);
 
-    history.pushState(null, '', '/c/second');
-    cb.mockClear(); // pushState already reported 'second'
-    history.back(); // jsdom fires popstate asynchronously
+    // popstate is an event, so it does cross into the content script's world.
+    history.replaceState(null, '', '/c/back');
+    window.dispatchEvent(new PopStateEvent('popstate'));
 
-    await vi.waitFor(() => expect(cb).toHaveBeenCalledWith('first'));
+    expect(cb).toHaveBeenCalledWith('back');
     stop();
   });
 
   it('does not fire when the id is unchanged', () => {
+    vi.useFakeTimers();
     history.replaceState(null, '', '/c/same');
     const cb = vi.fn();
     const stop = watchConversationId(cb);
 
     history.pushState(null, '', '/c/same?scrolled=1');
+    vi.advanceTimersByTime(POLL_MS * 3);
 
     expect(cb).not.toHaveBeenCalled();
     stop();
   });
 
-  it('restores the original history methods when stopped', () => {
-    const original = history.pushState;
-    const stop = watchConversationId(() => {});
-    stop();
+  it('stops polling once unsubscribed', () => {
+    vi.useFakeTimers();
+    const cb = vi.fn();
+    const stop = watchConversationId(cb);
 
-    expect(history.pushState).toBe(original);
+    stop();
+    history.pushState(null, '', '/c/after-stop');
+    vi.advanceTimersByTime(POLL_MS * 3);
+
+    expect(cb).not.toHaveBeenCalled();
   });
 });

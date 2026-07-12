@@ -118,3 +118,29 @@ test('keeps questions scoped to the conversation they were captured in', async (
     page.locator('question-drawer-ui').getByText('side effect에 대해 자세히 설명해줘'),
   ).toBeVisible();
 });
+
+test('follows the chat when the SPA swaps conversations without a reload', async () => {
+  const page = await context.newPage();
+  await mountFixture(page);
+
+  await page.goto('https://chatgpt.com/c/spa-a');
+  await page.getByText('side effect').selectText();
+  await page.dispatchEvent('body', 'mouseup');
+
+  const host = page.locator('question-drawer-ui');
+  await host.getByRole('button', { name: '서랍에 담기' }).click();
+  await expect(host.getByText('side effect에 대해 자세히 설명해줘')).toBeVisible();
+
+  // How the real sites switch chats: the router pushes a new URL, no reload.
+  // page.evaluate runs in the page's main world, like the site's own code, so
+  // this crosses the same isolated-world boundary the content script sits behind.
+  await page.evaluate(() => history.pushState(null, '', '/c/spa-b'));
+
+  await expect(host.getByText('답변에서 궁금한 부분을 드래그해 담아보세요')).toBeVisible();
+  await expect(host.getByText('side effect에 대해 자세히 설명해줘')).toHaveCount(0);
+
+  // And back again, still without a reload.
+  await page.evaluate(() => history.pushState(null, '', '/c/spa-a'));
+
+  await expect(host.getByText('side effect에 대해 자세히 설명해줘')).toBeVisible();
+});

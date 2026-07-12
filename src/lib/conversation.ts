@@ -4,6 +4,8 @@
 // script's match patterns.
 const PATTERNS = [/^\/chat\/([^/?#]+)/, /(?:^|\/)c\/([^/?#]+)/];
 
+export const POLL_MS = 400;
+
 export function getConversationId(url: string = location.href): string | null {
   let pathname: string;
   try {
@@ -18,9 +20,11 @@ export function getConversationId(url: string = location.href): string | null {
   return null;
 }
 
-// Both sites swap the URL without a reload — sending the first message in a new
-// chat turns /new into /chat/<id> via history. Patch pushState/replaceState and
-// listen for popstate so we see it.
+// Switching chats is a pushState, which fires no event. Patching history is no
+// help either: this runs in the content script's isolated world, so the page's
+// own history object — the one the site's router calls — is untouched by it.
+// Polling the URL is what actually sees the switch. popstate IS delivered here,
+// so back/forward lands without waiting for the next tick.
 export function watchConversationId(cb: (id: string | null) => void): () => void {
   let current = getConversationId();
 
@@ -31,27 +35,11 @@ export function watchConversationId(cb: (id: string | null) => void): () => void
     cb(next);
   };
 
-  const { pushState, replaceState } = history;
-
-  history.pushState = function (
-    this: History,
-    ...args: Parameters<History['pushState']>
-  ) {
-    pushState.apply(this, args);
-    emit();
-  };
-  history.replaceState = function (
-    this: History,
-    ...args: Parameters<History['replaceState']>
-  ) {
-    replaceState.apply(this, args);
-    emit();
-  };
+  const timer = setInterval(emit, POLL_MS);
   window.addEventListener('popstate', emit);
 
   return () => {
-    history.pushState = pushState;
-    history.replaceState = replaceState;
+    clearInterval(timer);
     window.removeEventListener('popstate', emit);
   };
 }
