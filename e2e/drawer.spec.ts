@@ -53,5 +53,11 @@ test('captures a selection and inserts the question', async () => {
   await expect(item).toBeVisible();
 
   await item.click();
+
+  // The drawer opens docked, so the host page gets pushed aside.
+  // `:root` (not `html`) because `html` also matches the synthetic
+  // <html> WXT injects inside the shadow root for style isolation.
+  await expect(page.locator(':root')).toHaveClass(/qd-docked/);
+
   await expect(page.locator('#prompt-textarea')).toContainText('side effect에 대해 자세히 설명해줘');
 });
