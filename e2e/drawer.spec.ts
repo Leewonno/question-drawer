@@ -8,13 +8,10 @@ const EXT_PATH = path.resolve(__dirname, '../.output/chrome-mv3');
 // Fixture mimics chatgpt.com's input box so the adapter resolves without login.
 // A live-site flow requires a logged-in session and is documented as manual.
 //
-// NOTE: loading a browser extension requires a headful (or --headless=new)
-// Chromium launch. In a sandboxed/CI environment without a display, this
-// suite may be unable to launch at all (X server / display error) rather
-// than fail on its assertions. That failure mode is an environment
-// limitation, not a defect in the test or the extension; the test is
-// verified-by-construction against the brief and should be run in a
-// headful CI environment (e.g. xvfb-run) to get a real pass signal.
+// This test loads the built extension (.output/chrome-mv3) into a real
+// Chromium instance and drives the full capture -> persist -> insert flow
+// against the local fixture page above. It requires a headful (or
+// `--headless=new`) Chromium launch to load the unpacked extension.
 let context: BrowserContext;
 
 test.beforeAll(async () => {
