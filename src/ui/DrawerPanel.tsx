@@ -36,8 +36,8 @@ export function DrawerPanel({ site, onItemClick }: Props) {
 
   const subtitle =
     sorted.length > 0
-      ? `떠오른 질문 ${sorted.length}개 · 클릭하면 바로 질문`
-      : '클릭 한 번으로 질문을 담아두세요';
+      ? `떠오른 질문 ${sorted.length}개 · 클릭하면 바로 저장`
+      : '클릭 한 번으로 질문을 담아보세요';
 
   return (
     <div className={theme === 'dark' ? 'qd-dark' : undefined}>
