@@ -1,9 +1,12 @@
 # 질문서랍 (Question Drawer)
 
 <div align="center">
+  
+<br />
 
 <img width="600" alt="질문서랍 — Question Drawer" src="docs/assets/banner.svg" />
 
+<br />
 <br />
 
 ![WXT](https://img.shields.io/badge/WXT-67D74E?style=for-the-badge&logoColor=white)
