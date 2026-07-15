@@ -20,10 +20,10 @@ export function DrawerPanel({ site, onItemClick }: Props) {
   const theme = useHostTheme();
 
   const sorted = useMemo(
-    () => [...items].sort((a, b) => b.createdAt - a.createdAt),
+    () => [...items].sort((a, b) => a.createdAt - b.createdAt),
     [items],
   );
-  const freshId = useFreshItemId(sorted[0]);
+  const freshId = useFreshItemId(sorted[sorted.length - 1]);
 
   useEffect(() => {
     applyDock(open);
