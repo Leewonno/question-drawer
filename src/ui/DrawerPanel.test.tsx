@@ -54,7 +54,7 @@ describe('DrawerPanel', () => {
     ).toBeInTheDocument();
   });
 
-  it('lists the newest question first', async () => {
+  it('lists the newest question last', async () => {
     await drawerStorage.add({ ...createDrawerItem('older', 'claude', null), createdAt: 1000 });
     await drawerStorage.add({ ...createDrawerItem('newer', 'claude', null), createdAt: 2000 });
     render(<DrawerPanel site="claude" onItemClick={() => {}} />);
@@ -63,8 +63,8 @@ describe('DrawerPanel', () => {
     const questions = screen
       .getAllByRole('listitem')
       .map((li) => li.textContent ?? '');
-    expect(questions[0]).toContain('newer');
-    expect(questions[1]).toContain('older');
+    expect(questions[0]).toContain('older');
+    expect(questions[1]).toContain('newer');
   });
 
   it('hides questions captured in another conversation', async () => {

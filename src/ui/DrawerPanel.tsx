@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useDrawerItems } from './useDrawerItems';
 import { useConversationId } from './useConversationId';
 import { useFreshItemId } from './useFreshItemId';
@@ -25,9 +25,20 @@ export function DrawerPanel({ site, onItemClick }: Props) {
   );
   const freshId = useFreshItemId(sorted[sorted.length - 1]);
 
+  const listRef = useRef<HTMLDivElement>(null);
+  const newestId = sorted[sorted.length - 1]?.id;
+
   useEffect(() => {
     applyDock(open);
   }, [open]);
+
+  // Scroll to the bottom whenever a new question lands there, so the freshly
+  // stacked item is visible even when the list already overflows.
+  useEffect(() => {
+    if (!open || newestId == null) return;
+    const el = listRef.current;
+    if (el) el.scrollTop = el.scrollHeight;
+  }, [open, newestId]);
 
   // Undock on unmount too. The content script's onRemove also calls this, but a
   // render error or an SPA teardown that skips onRemove would otherwise leave the
@@ -63,7 +74,7 @@ export function DrawerPanel({ site, onItemClick }: Props) {
             <p className="mt-1 text-xs text-qd-muted dark:text-qd-muted-dark">{subtitle}</p>
           </header>
 
-          <div className="flex-1 overflow-y-auto px-3 pb-3">
+          <div ref={listRef} className="flex-1 overflow-y-auto px-3 pb-3">
             {sorted.length === 0 ? (
               <p className="rounded-xl border border-dashed border-qd-line px-3 py-6 text-center text-xs leading-relaxed text-balance text-qd-muted dark:border-qd-line-dark dark:text-qd-muted-dark">
                 답변에서 궁금한 부분을 드래그해 담아보세요
