@@ -1,0 +1,36 @@
+<svg width="128" height="128" viewBox="0 0 128 128" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="질문서랍 Question Drawer">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="128" y2="128" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#F5C066"/>
+      <stop offset="0.55" stop-color="#EDA24E"/>
+      <stop offset="1" stop-color="#E28638"/>
+    </linearGradient>
+    <radialGradient id="topglow" cx="0.3" cy="0.1" r="0.95">
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity="0.32"/>
+      <stop offset="1" stop-color="#FFFFFF" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="drawer" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFFDF9"/>
+      <stop offset="1" stop-color="#F3E7D3"/>
+    </linearGradient>
+    <linearGradient id="inside" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#B26521"/>
+      <stop offset="1" stop-color="#CE7E37"/>
+    </linearGradient>
+    <filter id="drawersh" x="-30%" y="-30%" width="160%" height="170%">
+      <feDropShadow dx="0" dy="4" stdDeviation="4.5" flood-color="#7a4310" flood-opacity="0.30"/>
+    </filter>
+  </defs>
+
+  <!-- background -->
+  <rect width="128" height="128" rx="29" fill="url(#bg)"/>
+  <rect width="128" height="128" rx="29" fill="url(#topglow)"/>
+
+  <!-- centered drawer -->
+  <g filter="url(#drawersh)">
+    <!-- drawer front face -->
+    <rect x="22" y="43" width="84" height="42" rx="13" fill="url(#drawer)"/>
+    <!-- handle -->
+    <rect x="49" y="60" width="30" height="8" rx="4" fill="#E28C4E"/>
+  </g>
+</svg>

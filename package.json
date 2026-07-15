@@ -2,7 +2,7 @@
   "name": "question-drawer",
   "description": "Drag-select terms in Claude/ChatGPT answers and save follow-up questions.",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "wxt",
