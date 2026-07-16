@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 
 interface Props {
   onCapture: (text: string) => void;
+  isWithinChat: (node: Node | null) => boolean;
 }
 
 interface Pos {
@@ -10,7 +11,7 @@ interface Pos {
   y: number;
 }
 
-export function SelectionButton({ onCapture }: Props) {
+export function SelectionButton({ onCapture, isWithinChat }: Props) {
   const [pos, setPos] = useState<Pos | null>(null);
 
   useEffect(() => {
@@ -22,6 +23,12 @@ export function SelectionButton({ onCapture }: Props) {
         return;
       }
       const range = sel.getRangeAt(0);
+      // Only offer capture for selections inside a chat message — not the input
+      // box, sidebar, or our own UI.
+      if (!isWithinChat(range.commonAncestorContainer)) {
+        setPos(null);
+        return;
+      }
       // Some environments (e.g. jsdom) don't implement Range.getBoundingClientRect
       // at all. Real browsers do; fall back to a zero rect so positioning simply
       // degrades instead of throwing.
@@ -37,7 +44,7 @@ export function SelectionButton({ onCapture }: Props) {
       document.removeEventListener('mouseup', update);
       document.removeEventListener('selectionchange', update);
     };
-  }, []);
+  }, [isWithinChat]);
 
   if (!pos) return null;
 

@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { DrawerPanel } from './DrawerPanel';
 import { SelectionButton } from './SelectionButton';
 import { useConversationId } from './useConversationId';
@@ -27,6 +27,11 @@ export function App({ site }: { site: SiteId }) {
     });
   }, [conversationId, site]);
 
+  const isWithinChat = useCallback(
+    (node: Node | null) => getActiveAdapter()?.isWithinChat(node) ?? false,
+    [],
+  );
+
   const handleCapture = (text: string) => {
     drawerStorage
       .add(createDrawerItem(text, site, getConversationId()))
@@ -50,7 +55,7 @@ export function App({ site }: { site: SiteId }) {
 
   return (
     <>
-      <SelectionButton onCapture={handleCapture} />
+      <SelectionButton onCapture={handleCapture} isWithinChat={isWithinChat} />
       <DrawerPanel site={site} onItemClick={handleItemClick} />
     </>
   );

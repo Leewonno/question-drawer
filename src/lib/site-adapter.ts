@@ -6,6 +6,9 @@ export interface SiteAdapter {
   id: SiteId;
   getInputBox(): HTMLElement | null;
   insertPrompt(text: string): boolean;
+  // Whether a node lives inside an actual chat message (as opposed to the input
+  // box, sidebar, settings, or our own UI). Gates the capture button.
+  isWithinChat(node: Node | null): boolean;
 }
 
 // Prefer stable selectors (role/aria/element type) over obfuscated class names.
@@ -15,6 +18,15 @@ function firstMatch(selectors: string[]): HTMLElement | null {
     if (el) return el;
   }
   return null;
+}
+
+// A node counts as "within chat" when it (or an ancestor) matches one of the
+// message-container selectors. Positive matching naturally excludes the input
+// box and page chrome, which never sit inside a message element.
+function withinAny(node: Node | null, selectors: string[]): boolean {
+  const el = node instanceof Element ? node : (node?.parentElement ?? null);
+  if (!el) return false;
+  return selectors.some((sel) => el.closest(sel) !== null);
 }
 
 function setText(el: HTMLElement, text: string): void {
@@ -61,6 +73,12 @@ const chatgpt: SiteAdapter = {
     setText(box, text);
     return true;
   },
+  isWithinChat: (node) =>
+    withinAny(node, [
+      '[data-message-author-role]',
+      '[data-testid^="conversation-turn"]',
+      '.markdown',
+    ]),
 };
 
 const claude: SiteAdapter = {
@@ -80,6 +98,12 @@ const claude: SiteAdapter = {
     setText(box, text);
     return true;
   },
+  isWithinChat: (node) =>
+    withinAny(node, [
+      '[data-testid="user-message"]',
+      '.font-claude-message',
+      '[data-test-render-count]',
+    ]),
 };
 
 export function getActiveAdapter(host: string = location.hostname): SiteAdapter | null {

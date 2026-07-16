@@ -69,6 +69,34 @@ describe('insertPrompt', () => {
   });
 });
 
+describe('isWithinChat', () => {
+  beforeEach(() => {
+    document.body.innerHTML = '';
+  });
+
+  it('matches nodes inside a claude assistant message', () => {
+    document.body.innerHTML = '<div class="font-claude-message"><p id="a">hi</p></div>';
+    const adapter = getActiveAdapter('claude.ai')!;
+    expect(adapter.isWithinChat(document.getElementById('a')!.firstChild)).toBe(true);
+  });
+
+  it('matches nodes inside a chatgpt message turn', () => {
+    document.body.innerHTML = '<div data-message-author-role="assistant"><p id="a">hi</p></div>';
+    const adapter = getActiveAdapter('chatgpt.com')!;
+    expect(adapter.isWithinChat(document.getElementById('a')!.firstChild)).toBe(true);
+  });
+
+  it('rejects nodes in the input box or page chrome', () => {
+    document.body.innerHTML = '<textarea id="input"></textarea><nav id="side">x</nav>';
+    expect(getActiveAdapter('claude.ai')!.isWithinChat(document.getElementById('input'))).toBe(false);
+    expect(getActiveAdapter('chatgpt.com')!.isWithinChat(document.getElementById('side'))).toBe(false);
+  });
+
+  it('rejects a null node', () => {
+    expect(getActiveAdapter('claude.ai')!.isWithinChat(null)).toBe(false);
+  });
+});
+
 describe('getActiveAdapter host matching', () => {
   it('rejects a spoofed host that merely ends with claude.ai', () => {
     expect(getActiveAdapter('evilclaude.ai')).toBeNull();
