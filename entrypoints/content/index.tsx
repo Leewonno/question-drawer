@@ -4,6 +4,7 @@ import { App } from '@/src/ui/App';
 import { getActiveAdapter } from '@/src/lib/site-adapter';
 import { logger } from '@/src/lib/logger';
 import { cleanupDock } from '@/src/lib/dock';
+import { loadPretendard } from '@/src/lib/font';
 
 export default defineContentScript({
   matches: ['*://claude.ai/*', '*://chatgpt.com/*'],
@@ -14,6 +15,7 @@ export default defineContentScript({
       logger.warn('no adapter for host, skipping mount');
       return;
     }
+    void loadPretendard();
     const ui = await createShadowRootUi(ctx, {
       name: 'question-drawer-ui',
       position: 'inline',

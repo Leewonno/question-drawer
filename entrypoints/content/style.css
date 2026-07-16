@@ -1,11 +1,21 @@
 @import "tailwindcss";
 
+/* Pretendard's @font-face is registered at runtime from the content script
+   (see entrypoints/content/index.tsx). Host pages (claude.ai / chatgpt.com)
+   send `default-src 'none'` with no font-src, so CDN- and data:-URI fonts are
+   both blocked — only the extension's own web-accessible chrome-extension://
+   resource loads, and its absolute URL is only knowable at runtime. */
+
 /* The drawer lives in a shadow root, so Tailwind's default `dark:` variant
    (prefers-color-scheme) would follow the OS instead of the host page. Bind it
    to a class we set from useHostTheme() on the shadow root's top wrapper. */
 @custom-variant dark (&:where(.qd-dark, .qd-dark *));
 
 @theme {
+  --font-sans: 'Pretendard Variable', 'Pretendard', -apple-system,
+    BlinkMacSystemFont, system-ui, 'Segoe UI', Roboto, 'Apple SD Gothic Neo',
+    'Noto Sans KR', 'Malgun Gothic', sans-serif;
+
   --color-qd-panel: #fdf9ee;
   --color-qd-panel-dark: #1b1a17;
   --color-qd-card: #ffffff;
