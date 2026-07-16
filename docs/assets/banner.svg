@@ -19,6 +19,24 @@
     <filter id="cardsh" x="-20%" y="-40%" width="140%" height="180%">
       <feDropShadow dx="0" dy="2" stdDeviation="4" flood-color="#9a8064" flood-opacity="0.18"/>
     </filter>
+
+    <!-- app icon (matches store-icon-128) -->
+    <linearGradient id="icbg" x1="0" y1="0" x2="128" y2="128" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#F5C066"/>
+      <stop offset="0.55" stop-color="#EDA24E"/>
+      <stop offset="1" stop-color="#E28638"/>
+    </linearGradient>
+    <radialGradient id="ictopglow" cx="0.3" cy="0.1" r="0.95">
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity="0.32"/>
+      <stop offset="1" stop-color="#FFFFFF" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="icdrawer" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFFDF9"/>
+      <stop offset="1" stop-color="#F3E7D3"/>
+    </linearGradient>
+    <filter id="icdrawersh" x="-30%" y="-30%" width="160%" height="170%">
+      <feDropShadow dx="0" dy="4" stdDeviation="4.5" flood-color="#7a4310" flood-opacity="0.30"/>
+    </filter>
   </defs>
 
   <!-- background -->
@@ -34,15 +52,17 @@
 
   <!-- left: text -->
   <g transform="translate(80, 132)">
-    <!-- puzzle mark -->
-    <g transform="translate(0,-58)">
-      <rect x="0" y="0" width="46" height="46" rx="10" fill="url(#clay)"/>
-      <circle cx="23" cy="6" r="7" fill="url(#clay)"/>
-      <circle cx="40" cy="23" r="7" fill="url(#clay)"/>
-      <rect x="14" y="14" width="18" height="18" rx="4" fill="#FBF7F1"/>
+    <!-- app icon mark (matches store-icon-128) -->
+    <g transform="translate(0,-76) scale(0.359375)">
+      <rect width="128" height="128" rx="29" fill="url(#icbg)"/>
+      <rect width="128" height="128" rx="29" fill="url(#ictopglow)"/>
+      <g filter="url(#icdrawersh)">
+        <rect x="22" y="43" width="84" height="42" rx="13" fill="url(#icdrawer)"/>
+        <rect x="49" y="60" width="30" height="8" rx="4" fill="#E28C4E"/>
+      </g>
     </g>
     <text x="0" y="52" font-family="'Pretendard','Apple SD Gothic Neo','Segoe UI',sans-serif" font-size="76" font-weight="800" fill="#2E2A26" letter-spacing="-1">질문서랍</text>
-    <text x="4" y="96" font-family="'SF Mono','JetBrains Mono',monospace" font-size="26" font-weight="600" fill="#C15F3C" letter-spacing="4">QUESTION&#160;DRAWER</text>
+    <text x="4" y="96" font-family="'Pretendard','Apple SD Gothic Neo','Segoe UI',sans-serif" font-size="26" font-weight="600" fill="#C15F3C" letter-spacing="2">QUESTION&#160;DRAWER</text>
     <text x="4" y="140" font-family="'Pretendard','Apple SD Gothic Neo','Segoe UI',sans-serif" font-size="22" font-weight="500" fill="#7C7368">궁금한 부분을 드래그해 담아두면,</text>
     <text x="4" y="170" font-family="'Pretendard','Apple SD Gothic Neo','Segoe UI',sans-serif" font-size="22" font-weight="500" fill="#7C7368">클릭 한 번으로 후속 질문을 꽂아주는 확장</text>
   </g>
@@ -51,13 +71,16 @@
   <g transform="translate(720, 44)" filter="url(#soft)">
     <!-- drawer panel -->
     <rect x="0" y="0" width="400" height="312" rx="20" fill="#FDFBF7" stroke="#E7DDCD" stroke-width="1.5"/>
-    <!-- drawer handle tab -->
-    <rect x="-14" y="118" width="14" height="76" rx="6" fill="url(#clay)"/>
+    <!-- drawer toggle tab (matches real 서랍 열기/닫기 button) -->
+    <g filter="url(#cardsh)">
+      <path d="M 0 136 L -18 136 Q -26 136 -26 144 L -26 168 Q -26 176 -18 176 L 0 176" fill="#FDF9EE" stroke="#F0E3C4" stroke-width="1.2"/>
+      <text x="-13" y="162" text-anchor="middle" font-family="'Pretendard','Segoe UI',sans-serif" font-size="17" font-weight="600" fill="#8B8172">&#8249;</text>
+    </g>
 
     <!-- header -->
     <g transform="translate(24,24)">
       <text x="0" y="14" font-family="'Pretendard','Segoe UI',sans-serif" font-size="17" font-weight="700" fill="#2E2A26">질문서랍</text>
-      <text x="0" y="38" font-family="'Pretendard','Segoe UI',sans-serif" font-size="11.5" font-weight="500" fill="#A69A8B">떠오른 질문 2개 · 클릭하면 바로 저장</text>
+      <text x="0" y="38" font-family="'Pretendard','Segoe UI',sans-serif" font-size="11.5" font-weight="500" fill="#A69A8B">떠오른 질문 2개 · 드래그해 담고 클릭해 꺼내기</text>
     </g>
     <line x1="24" y1="76" x2="376" y2="76" stroke="#EFE7D9" stroke-width="1"/>
 
@@ -71,7 +94,7 @@
 
     <!-- card 2: highlighted (방금 담김) -->
     <g transform="translate(24,164)" filter="url(#cardsh)">
-      <rect x="0" y="0" width="352" height="64" rx="12" fill="#FDF1E9" stroke="#E4915F" stroke-width="1.6"/>
+      <rect x="0" y="0" width="352" height="74" rx="12" fill="#FDF1E9" stroke="#E4915F" stroke-width="1.6"/>
       <text x="18" y="35" font-family="'Pretendard','Segoe UI',sans-serif" font-size="15" fill="#D06A44">✦</text>
       <text x="40" y="30" font-family="'Pretendard','Segoe UI',sans-serif" font-size="14" font-weight="600" fill="#3B352E">취향에 대해 자세히 설명해줘</text>
       <!-- 방금 담김 pill -->
@@ -82,6 +105,6 @@
     </g>
 
     <!-- footer hint -->
-    <text x="200" y="262" text-anchor="middle" font-family="'Pretendard','Segoe UI',sans-serif" font-size="11" font-weight="500" fill="#B4A897">답변의 단어를 클릭하거나 직접 질문을 적어 담아두세요</text>
+    <text x="200" y="272" text-anchor="middle" font-family="'Pretendard','Segoe UI',sans-serif" font-size="11" font-weight="500" fill="#B4A897">궁금한 부분을 드래그해 '서랍에 담기'로 저장하세요</text>
   </g>
 </svg>
