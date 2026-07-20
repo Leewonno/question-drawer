@@ -78,7 +78,7 @@ export function DrawerPanel({ site, onItemClick, onAddQuestion }: Props) {
                 <button
                   aria-label="질문 직접 담기"
                   onClick={() => setAdding(true)}
-                  className="-mt-0.5 shrink-0 rounded-lg border border-qd-line px-2 py-0.5 text-base leading-none text-qd-muted transition-colors hover:border-qd-accent hover:text-qd-accent dark:border-qd-line-dark dark:text-qd-muted-dark"
+                  className="-mt-0.5 cursor-pointer shrink-0 rounded-lg border border-qd-line px-2 py-2 text-base leading-none text-qd-muted transition-colors hover:border-qd-accent hover:text-qd-accent dark:border-qd-line-dark dark:text-qd-muted-dark"
                 >
                   +
                 </button>

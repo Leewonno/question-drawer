@@ -38,7 +38,7 @@ export function DrawerItemCard({ item, fresh, onClick, onRemove }: Props) {
       <button
         aria-label="삭제"
         onClick={onRemove}
-        className="absolute right-1 top-1 rounded p-1 text-qd-muted opacity-0 transition-opacity hover:text-qd-danger focus-visible:opacity-100 group-hover:opacity-100 dark:text-qd-muted-dark"
+        className="absolute right-2 top-1 rounded p-1 text-qd-muted opacity-0 transition-opacity hover:text-qd-danger focus-visible:opacity-100 group-hover:opacity-100 dark:text-qd-muted-dark"
       >
         ×
       </button>
