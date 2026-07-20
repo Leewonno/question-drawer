@@ -1,6 +1,6 @@
 {
   "name": "question-drawer",
-  "description": "AI 답변에서 궁금한 내용을 드래그해 질문으로 저장.",
+  "description": "AI 답변에서 궁금한 내용을 드래그해 질문으로 저장",
   "private": true,
   "version": "1.1.0",
   "type": "module",
