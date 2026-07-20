@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { buildQuestion, createDrawerItem } from './template';
+import { buildQuestion, createDrawerItem, createManualDrawerItem } from './template';
 
 describe('buildQuestion', () => {
   it('wraps trimmed text in the default template', () => {
@@ -24,5 +24,21 @@ describe('createDrawerItem', () => {
 
   it('keeps the conversation id null when the chat has none yet', () => {
     expect(createDrawerItem('side effect', 'chatgpt', null).conversationId).toBeNull();
+  });
+});
+
+describe('createManualDrawerItem', () => {
+  it('stores the typed text verbatim without applying the template', () => {
+    vi.spyOn(crypto, 'randomUUID').mockReturnValue('11111111-1111-1111-1111-111111111111');
+    vi.spyOn(Date, 'now').mockReturnValue(42);
+    const item = createManualDrawerItem('  리액트 훅 설명해줘  ', 'claude', 'chat-1');
+    expect(item).toEqual({
+      id: '11111111-1111-1111-1111-111111111111',
+      selectedText: '리액트 훅 설명해줘',
+      question: '리액트 훅 설명해줘',
+      site: 'claude',
+      conversationId: 'chat-1',
+      createdAt: 42,
+    });
   });
 });

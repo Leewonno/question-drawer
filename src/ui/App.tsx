@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef } from 'react';
 import { DrawerPanel } from './DrawerPanel';
 import { SelectionButton } from './SelectionButton';
 import { useConversationId } from './useConversationId';
-import { createDrawerItem } from '@/src/lib/template';
+import { createDrawerItem, createManualDrawerItem } from '@/src/lib/template';
 import { drawerStorage } from '@/src/lib/storage';
 import { getConversationId } from '@/src/lib/conversation';
 import { getActiveAdapter, type SiteId } from '@/src/lib/site-adapter';
@@ -41,6 +41,15 @@ export function App({ site }: { site: SiteId }) {
       });
   };
 
+  const handleManualAdd = (question: string) => {
+    drawerStorage
+      .add(createManualDrawerItem(question, site, getConversationId()))
+      .catch((error) => {
+        logger.error('failed to save drawer item', error);
+        showToast('저장에 실패했어요');
+      });
+  };
+
   const handleItemClick = async (item: DrawerItem) => {
     const adapter = getActiveAdapter();
     if (adapter?.insertPrompt(item.question)) return;
@@ -56,7 +65,11 @@ export function App({ site }: { site: SiteId }) {
   return (
     <>
       <SelectionButton onCapture={handleCapture} isWithinChat={isWithinChat} />
-      <DrawerPanel site={site} onItemClick={handleItemClick} />
+      <DrawerPanel
+        site={site}
+        onItemClick={handleItemClick}
+        onAddQuestion={handleManualAdd}
+      />
     </>
   );
 }

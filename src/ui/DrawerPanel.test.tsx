@@ -78,6 +78,28 @@ describe('DrawerPanel', () => {
     expect(screen.queryByText('elsewhere에 대해 자세히 설명해줘')).toBeNull();
   });
 
+  it('saves a typed question through the add modal', async () => {
+    const onAddQuestion = vi.fn();
+    render(
+      <DrawerPanel site="claude" onItemClick={() => {}} onAddQuestion={onAddQuestion} />,
+    );
+
+    await userEvent.click(screen.getByRole('button', { name: '질문 직접 담기' }));
+    await userEvent.type(
+      screen.getByRole('dialog').querySelector('textarea')!,
+      '리액트 훅 설명해줘',
+    );
+    await userEvent.click(screen.getByRole('button', { name: '담기' }));
+
+    expect(onAddQuestion).toHaveBeenCalledWith('리액트 훅 설명해줘');
+    expect(screen.queryByRole('dialog')).toBeNull();
+  });
+
+  it('does not offer the add button without an onAddQuestion handler', () => {
+    render(<DrawerPanel site="claude" onItemClick={() => {}} />);
+    expect(screen.queryByRole('button', { name: '질문 직접 담기' })).toBeNull();
+  });
+
   it('docks the page while open and undocks when collapsed', async () => {
     render(<DrawerPanel site="claude" onItemClick={() => {}} />);
 

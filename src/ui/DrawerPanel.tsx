@@ -3,6 +3,7 @@ import { useDrawerItems } from "./useDrawerItems";
 import { useConversationId } from "./useConversationId";
 import { useFreshItemId } from "./useFreshItemId";
 import { DrawerItemCard } from "./DrawerItemCard";
+import { AddQuestionModal } from "./AddQuestionModal";
 import { useHostTheme } from "@/src/lib/theme";
 import { applyDock, cleanupDock, DRAWER_WIDTH_PX } from "@/src/lib/dock";
 import type { SiteId } from "@/src/lib/site-adapter";
@@ -11,12 +12,14 @@ import type { DrawerItem } from "@/src/lib/schema";
 interface Props {
   site: SiteId;
   onItemClick: (item: DrawerItem) => void;
+  onAddQuestion?: (question: string) => void;
 }
 
-export function DrawerPanel({ site, onItemClick }: Props) {
+export function DrawerPanel({ site, onItemClick, onAddQuestion }: Props) {
   const conversationId = useConversationId();
   const { items, remove } = useDrawerItems(site, conversationId);
   const [open, setOpen] = useState(true);
+  const [adding, setAdding] = useState(false);
   const theme = useHostTheme();
 
   const sorted = useMemo(
@@ -67,9 +70,20 @@ export function DrawerPanel({ site, onItemClick }: Props) {
           className="pointer-events-auto fixed right-0 top-0 z-[2147483647] flex h-screen flex-col border-l border-qd-line bg-qd-panel font-sans dark:border-qd-line-dark dark:bg-qd-panel-dark"
         >
           <header className="px-4 pb-3 pt-4">
-            <h2 className="flex items-center gap-1.5 text-sm font-semibold text-qd-ink dark:text-qd-ink-dark">
-              질문서랍
-            </h2>
+            <div className="flex items-start justify-between gap-2">
+              <h2 className="flex items-center gap-1.5 text-sm font-semibold text-qd-ink dark:text-qd-ink-dark">
+                질문서랍
+              </h2>
+              {onAddQuestion && (
+                <button
+                  aria-label="질문 직접 담기"
+                  onClick={() => setAdding(true)}
+                  className="-mt-0.5 shrink-0 rounded-lg border border-qd-line px-2 py-0.5 text-base leading-none text-qd-muted transition-colors hover:border-qd-accent hover:text-qd-accent dark:border-qd-line-dark dark:text-qd-muted-dark"
+                >
+                  +
+                </button>
+              )}
+            </div>
             <p className="mt-1 text-xs text-qd-muted dark:text-qd-muted-dark">
               {subtitle}
             </p>
@@ -99,6 +113,16 @@ export function DrawerPanel({ site, onItemClick }: Props) {
             궁금한 내용을 드래그해보세요.
           </footer>
         </aside>
+      )}
+
+      {adding && onAddQuestion && (
+        <AddQuestionModal
+          onSave={(question) => {
+            onAddQuestion(question);
+            setAdding(false);
+          }}
+          onClose={() => setAdding(false)}
+        />
       )}
     </div>
   );
