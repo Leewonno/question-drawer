@@ -17,9 +17,10 @@ interface Props {
 
 export function DrawerPanel({ site, onItemClick, onAddQuestion }: Props) {
   const conversationId = useConversationId();
-  const { items, remove } = useDrawerItems(site, conversationId);
+  const { items, remove, update } = useDrawerItems(site, conversationId);
   const [open, setOpen] = useState(true);
   const [adding, setAdding] = useState(false);
+  const [editing, setEditing] = useState<DrawerItem | null>(null);
   const theme = useHostTheme();
 
   const sorted = useMemo(
@@ -57,6 +58,7 @@ export function DrawerPanel({ site, onItemClick, onAddQuestion }: Props) {
     <div className={theme === "dark" ? "qd-dark" : undefined}>
       <button
         aria-label={open ? "서랍 닫기" : "서랍 열기"}
+        aria-expanded={open}
         onClick={() => setOpen((v) => !v)}
         style={{ right: open ? DRAWER_WIDTH_PX : 0 }}
         className="pointer-events-auto fixed top-1/3 z-[2147483647] rounded-l-lg border border-r-0 border-qd-line bg-qd-panel px-2 py-3 text-xs text-qd-muted shadow-sm dark:border-qd-line-dark dark:bg-qd-panel-dark dark:text-qd-muted-dark"
@@ -103,6 +105,7 @@ export function DrawerPanel({ site, onItemClick, onAddQuestion }: Props) {
                     fresh={item.id === freshId}
                     onClick={() => onItemClick(item)}
                     onRemove={() => remove(item.id)}
+                    onEdit={() => setEditing(item)}
                   />
                 ))}
               </ul>
@@ -113,6 +116,17 @@ export function DrawerPanel({ site, onItemClick, onAddQuestion }: Props) {
             궁금한 내용을 드래그해보세요.
           </footer>
         </aside>
+      )}
+
+      {editing && (
+        <AddQuestionModal
+          initialValue={editing.question}
+          onSave={(question) => {
+            update(editing.id, question);
+            setEditing(null);
+          }}
+          onClose={() => setEditing(null)}
+        />
       )}
 
       {adding && onAddQuestion && (

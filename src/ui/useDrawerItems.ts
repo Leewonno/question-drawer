@@ -33,5 +33,9 @@ export function useDrawerItems(
     void drawerStorage.remove(id);
   };
 
-  return { items, remove };
+  const update = (id: string, question: string) => {
+    void drawerStorage.update(id, question);
+  };
+
+  return { items, remove, update };
 }

@@ -32,6 +32,12 @@ export const drawerStorage = {
     const state = await read();
     await write({ items: state.items.filter((i) => i.id !== id) });
   },
+  async update(id: string, question: string): Promise<void> {
+    const state = await read();
+    await write({
+      items: state.items.map((i) => (i.id === id ? { ...i, question } : i)),
+    });
+  },
   // Items captured on a fresh chat have no conversation id yet. Once the URL
   // grows one, they belong to that conversation.
   async adopt(site: DrawerItem['site'], conversationId: string): Promise<void> {

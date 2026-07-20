@@ -16,7 +16,15 @@ const item: DrawerItem = {
 describe('DrawerItemCard', () => {
   it('shows the question and fires onClick', async () => {
     const onClick = vi.fn();
-    render(<DrawerItemCard item={item} fresh={false} onClick={onClick} onRemove={() => {}} />);
+    render(
+      <DrawerItemCard
+        item={item}
+        fresh={false}
+        onClick={onClick}
+        onRemove={() => {}}
+        onEdit={() => {}}
+      />,
+    );
 
     await userEvent.click(screen.getByText(item.question));
     expect(onClick).toHaveBeenCalledTimes(1);
@@ -24,20 +32,56 @@ describe('DrawerItemCard', () => {
 
   it('fires onRemove from the delete button', async () => {
     const onRemove = vi.fn();
-    render(<DrawerItemCard item={item} fresh={false} onClick={() => {}} onRemove={onRemove} />);
+    render(
+      <DrawerItemCard
+        item={item}
+        fresh={false}
+        onClick={() => {}}
+        onRemove={onRemove}
+        onEdit={() => {}}
+      />,
+    );
 
     await userEvent.click(screen.getByRole('button', { name: '삭제' }));
     expect(onRemove).toHaveBeenCalledTimes(1);
   });
 
+  it('fires onEdit from the edit button', async () => {
+    const onEdit = vi.fn();
+    render(
+      <DrawerItemCard
+        item={item}
+        fresh={false}
+        onClick={() => {}}
+        onRemove={() => {}}
+        onEdit={onEdit}
+      />,
+    );
+
+    await userEvent.click(screen.getByRole('button', { name: '수정' }));
+    expect(onEdit).toHaveBeenCalledTimes(1);
+  });
+
   it('shows the just-added label only when fresh', () => {
     const { rerender } = render(
-      <DrawerItemCard item={item} fresh onClick={() => {}} onRemove={() => {}} />,
+      <DrawerItemCard
+        item={item}
+        fresh
+        onClick={() => {}}
+        onRemove={() => {}}
+        onEdit={() => {}}
+      />,
     );
     expect(screen.getByText('방금 담김')).toBeInTheDocument();
 
     rerender(
-      <DrawerItemCard item={item} fresh={false} onClick={() => {}} onRemove={() => {}} />,
+      <DrawerItemCard
+        item={item}
+        fresh={false}
+        onClick={() => {}}
+        onRemove={() => {}}
+        onEdit={() => {}}
+      />,
     );
     expect(screen.queryByText('방금 담김')).toBeNull();
   });

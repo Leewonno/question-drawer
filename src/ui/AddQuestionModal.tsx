@@ -3,15 +3,46 @@ import { useEffect, useRef, useState } from 'react';
 interface Props {
   onSave: (question: string) => void;
   onClose: () => void;
+  // Present when editing an existing question; its text prefills the field and
+  // switches the modal's copy to an edit affordance.
+  initialValue?: string;
 }
 
-export function AddQuestionModal({ onSave, onClose }: Props) {
-  const [value, setValue] = useState('');
+export function AddQuestionModal({ onSave, onClose, initialValue }: Props) {
+  const editing = initialValue !== undefined;
+  const [value, setValue] = useState(initialValue ?? '');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const dialogRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    // Restore focus to whatever opened the modal (the "+" button) on close, so
+    // keyboard/screen-reader users aren't stranded with focus on <body>.
+    const opener = document.activeElement as HTMLElement | null;
     textareaRef.current?.focus();
+    return () => opener?.focus?.();
   }, []);
+
+  // Keep Tab inside the modal. aria-modal hides the background from screen
+  // readers, but keyboard focus can still escape into the host page (claude.ai /
+  // ChatGPT) without an explicit trap.
+  const trapFocus = (e: React.KeyboardEvent) => {
+    if (e.key !== 'Tab') return;
+    const focusables = dialogRef.current?.querySelectorAll<HTMLElement>(
+      'button, textarea, [href], input, select, [tabindex]:not([tabindex="-1"])',
+    );
+    if (!focusables || focusables.length === 0) return;
+    const first = focusables[0];
+    const last = focusables[focusables.length - 1];
+    const active = dialogRef.current?.getRootNode() as ShadowRoot | Document;
+    const current = active.activeElement;
+    if (e.shiftKey && current === first) {
+      e.preventDefault();
+      last.focus();
+    } else if (!e.shiftKey && current === last) {
+      e.preventDefault();
+      first.focus();
+    }
+  };
 
   const trimmed = value.trim();
   const submit = () => {
@@ -22,7 +53,7 @@ export function AddQuestionModal({ onSave, onClose }: Props) {
     <div
       role="dialog"
       aria-modal="true"
-      aria-label="질문 직접 담기"
+      aria-labelledby="qd-add-title"
       onMouseDown={onClose}
       // The drawer lives in a shadow root, but key events still bubble to the
       // host page (claude.ai / ChatGPT), whose document-level shortcut handlers
@@ -31,23 +62,29 @@ export function AddQuestionModal({ onSave, onClose }: Props) {
       onKeyDown={(e) => {
         e.stopPropagation();
         if (e.key === 'Escape') onClose();
+        else trapFocus(e);
       }}
       onKeyUp={(e) => e.stopPropagation()}
       onKeyPress={(e) => e.stopPropagation()}
       className="pointer-events-auto fixed inset-0 z-[2147483647] flex items-center justify-center bg-black/40 p-4 font-sans"
     >
       <div
+        ref={dialogRef}
         onMouseDown={(e) => e.stopPropagation()}
         className="w-full max-w-sm rounded-2xl border border-qd-line bg-qd-panel p-5 shadow-xl dark:border-qd-line-dark dark:bg-qd-panel-dark"
       >
-        <h3 className="text-sm font-semibold text-qd-ink dark:text-qd-ink-dark">
-          질문 직접 담기
+        <h3
+          id="qd-add-title"
+          className="text-sm font-semibold text-qd-ink dark:text-qd-ink-dark"
+        >
+          {editing ? '질문 수정하기' : '질문 직접 담기'}
         </h3>
         <p className="mt-1 text-xs text-qd-muted dark:text-qd-muted-dark">
-          저장하고 싶은 질문을 입력하세요
+          {editing ? '질문 내용을 수정하세요' : '저장하고 싶은 질문을 입력하세요'}
         </p>
         <textarea
           ref={textareaRef}
+          aria-label="저장할 질문"
           value={value}
           onChange={(e) => setValue(e.target.value)}
           onKeyDown={(e) => {
@@ -69,7 +106,7 @@ export function AddQuestionModal({ onSave, onClose }: Props) {
             disabled={!trimmed}
             className="rounded-lg bg-qd-accent px-3 py-1.5 text-xs font-medium text-white transition-opacity disabled:cursor-not-allowed disabled:opacity-40"
           >
-            담기
+            {editing ? '수정' : '담기'}
           </button>
         </div>
       </div>

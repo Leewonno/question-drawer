@@ -5,9 +5,10 @@ interface Props {
   fresh: boolean;
   onClick: () => void;
   onRemove: () => void;
+  onEdit: () => void;
 }
 
-export function DrawerItemCard({ item, fresh, onClick, onRemove }: Props) {
+export function DrawerItemCard({ item, fresh, onClick, onRemove, onEdit }: Props) {
   return (
     <li
       className={`group relative rounded-xl border transition-colors ${
@@ -35,13 +36,34 @@ export function DrawerItemCard({ item, fresh, onClick, onRemove }: Props) {
           {fresh && <span className="text-xs text-qd-accent">방금 담김</span>}
         </span>
       </button>
-      <button
-        aria-label="삭제"
-        onClick={onRemove}
-        className="absolute right-2 top-1 rounded p-1 text-qd-muted opacity-0 transition-opacity hover:text-qd-danger focus-visible:opacity-100 group-hover:opacity-100 dark:text-qd-muted-dark"
-      >
-        ×
-      </button>
+      <div className="absolute right-2 top-1 flex items-center gap-0.5">
+        <button
+          aria-label="수정"
+          onClick={onEdit}
+          className="rounded p-1 text-qd-muted opacity-0 transition-opacity hover:text-qd-accent focus-visible:opacity-100 group-hover:opacity-100 dark:text-qd-muted-dark"
+        >
+          <svg
+            aria-hidden
+            viewBox="0 0 24 24"
+            className="h-3.5 w-3.5"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M12 20h9" />
+            <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z" />
+          </svg>
+        </button>
+        <button
+          aria-label="삭제"
+          onClick={onRemove}
+          className="rounded p-1 text-qd-muted opacity-0 transition-opacity hover:text-qd-danger focus-visible:opacity-100 group-hover:opacity-100 dark:text-qd-muted-dark"
+        >
+          ×
+        </button>
+      </div>
     </li>
   );
 }
