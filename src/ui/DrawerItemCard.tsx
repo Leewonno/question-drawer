@@ -36,11 +36,14 @@ export function DrawerItemCard({ item, fresh, onClick, onRemove, onEdit }: Props
           {fresh && <span className="text-xs text-qd-accent">방금 담김</span>}
         </span>
       </button>
-      <div className="absolute right-2 top-1 flex items-center gap-0.5">
+      {/* bg-inherit picks up the li's computed background, so the strip stays
+          opaque across all four card variants (fresh × dark) without repeating
+          the color tokens here. */}
+      <div className="pointer-events-none absolute right-1.5 top-1.5 flex items-center gap-0.5 rounded-lg bg-inherit px-0.5 opacity-0 transition-opacity focus-within:pointer-events-auto focus-within:opacity-100 group-hover:pointer-events-auto group-hover:opacity-100">
         <button
           aria-label="수정"
           onClick={onEdit}
-          className="rounded p-1 text-qd-muted opacity-0 transition-opacity hover:text-qd-accent focus-visible:opacity-100 group-hover:opacity-100 dark:text-qd-muted-dark"
+          className="rounded p-1 text-qd-muted hover:text-qd-accent dark:text-qd-muted-dark"
         >
           <svg
             aria-hidden
