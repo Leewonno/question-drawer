@@ -66,16 +66,19 @@ export function DrawerPanel({
         aria-expanded={open}
         onClick={() => setOpen((v) => !v)}
         style={{ right: open ? DRAWER_WIDTH_PX : 0 }}
-        className="pointer-events-auto fixed top-1/3 z-2147483647 rounded-l-lg border border-r-0 border-qd-line bg-qd-panel px-2 py-3 text-xs text-qd-muted shadow-sm dark:border-qd-line-dark dark:bg-qd-panel-dark dark:text-qd-muted-dark"
+        className="pointer-events-auto fixed top-1/3 z-2147483647 rounded-l-lg border border-r-0 border-qd-line bg-qd-panel px-2 py-3 text-xs text-qd-muted shadow-sm transition-[right] duration-300 ease-out dark:border-qd-line-dark dark:bg-qd-panel-dark dark:text-qd-muted-dark"
       >
         {open ? "›" : "‹"}
       </button>
 
-      {open && (
-        <aside
-          style={{ width: DRAWER_WIDTH_PX }}
-          className="pointer-events-auto fixed right-0 top-0 z-2147483647 flex h-screen flex-col border-l border-qd-line bg-qd-panel font-sans dark:border-qd-line-dark dark:bg-qd-panel-dark"
-        >
+      <aside
+        aria-hidden={!open}
+        inert={!open}
+        style={{ width: DRAWER_WIDTH_PX }}
+        className={`pointer-events-auto fixed right-0 top-0 z-2147483647 flex h-screen flex-col border-l border-qd-line bg-qd-panel font-sans transition-transform duration-300 ease-out dark:border-qd-line-dark dark:bg-qd-panel-dark ${
+          open ? "translate-x-0" : "translate-x-full"
+        }`}
+      >
           <header className="px-4 pb-3 pt-4">
             <div className="flex items-start justify-between gap-2">
               <h2 className="flex items-center gap-1.5 text-sm font-semibold text-qd-ink dark:text-qd-ink-dark">
@@ -120,8 +123,7 @@ export function DrawerPanel({
           <footer className="border-t border-dashed border-qd-line px-4 py-3 text-center text-xs leading-relaxed text-balance text-qd-muted dark:border-qd-line-dark dark:text-qd-muted-dark">
             궁금한 내용을 드래그해보세요.
           </footer>
-        </aside>
-      )}
+      </aside>
 
       {editing && (
         <AddQuestionModal
