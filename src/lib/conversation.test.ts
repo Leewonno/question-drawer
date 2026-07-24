@@ -23,6 +23,10 @@ describe('getConversationId', () => {
     expect(getConversationId('https://gemini.google.com/app/abc-123')).toBe('abc-123');
   });
 
+  it('reads the id from a deepseek conversation url', () => {
+    expect(getConversationId('https://chat.deepseek.com/a/chat/s/abc-123')).toBe('abc-123');
+  });
+
   it('ignores query strings and hashes', () => {
     expect(getConversationId('https://claude.ai/chat/abc-123?ref=x#top')).toBe('abc-123');
   });

@@ -25,11 +25,30 @@ const STYLE_ID = "question-drawer-dock";
 // the shell leaves it sitting under the drawer. It isn't width-driven, so slide
 // the whole bar left by the drawer width with a transform instead.
 //
+// deepseek.com is another 100vw-shell case: a single flex row (sidebar + main)
+// that ignores the <html> margin. DeepSeek exposes no stable class on that
+// shell — only hashed ones — so target it two ways and let whichever matches
+// win: (1) a stable, DeepSeek-scoped structural anchor — #root's child that
+// contains the composer <textarea name="search"> (present even on an empty
+// chat); (2) the current hashed shell class as a fallback for builds where the
+// root id or nesting differs. The header lives inside `main`, so it reflows with
+// the shell — no separate sibling shift is needed as on Gemini.
+//
 // The transition lives on the base (undocked) selector so the margin/width
 // animate in both directions — toggling the class only swaps the target value,
 // it doesn't re-declare the transition. Duration matches the panel's slide in
 // DrawerPanel.tsx (300ms) so the page and the drawer move as one.
 const DOCKED_WIDTH = `calc(100vw - ${DRAWER_WIDTH_PX}px)`;
+// NOTE: verify on the live page — if docking stops working after a DeepSeek
+// redeploy, the hashed fallback class (.c3ecdb44) is the first thing to refresh.
+const DEEPSEEK_SHELLS = [
+  '#root > div:has(textarea[name="search"])',
+  ".c3ecdb44",
+];
+const deepseekBase = DEEPSEEK_SHELLS.map((s) => `html ${s}`).join(", ");
+const deepseekDocked = DEEPSEEK_SHELLS.map(
+  (s) => `html.${DOCK_CLASS} ${s}`,
+).join(", ");
 const CSS = [
   `html { transition: margin-right 300ms ease; }`,
   `html.${DOCK_CLASS} { margin-right: ${DRAWER_WIDTH_PX}px !important; }`,
@@ -42,6 +61,11 @@ const CSS = [
     ` max-width: ${DOCKED_WIDTH} !important; }`,
   `html top-bar-actions { transition: transform 300ms ease; }`,
   `html.${DOCK_CLASS} top-bar-actions { transform: translateX(-${DRAWER_WIDTH_PX}px) !important; }`,
+  `${deepseekBase} { transition: width 300ms ease, min-width 300ms ease, max-width 300ms ease; }`,
+  `${deepseekDocked} {` +
+    ` width: ${DOCKED_WIDTH} !important;` +
+    ` min-width: ${DOCKED_WIDTH} !important;` +
+    ` max-width: ${DOCKED_WIDTH} !important; }`,
 ].join("\n");
 
 function ensureStyle(): void {

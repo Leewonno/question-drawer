@@ -14,6 +14,9 @@ describe('getActiveAdapter', () => {
   it('selects gemini adapter on gemini.google.com', () => {
     expect(getActiveAdapter('gemini.google.com')?.id).toBe('gemini');
   });
+  it('selects deepseek adapter on chat.deepseek.com', () => {
+    expect(getActiveAdapter('chat.deepseek.com')?.id).toBe('deepseek');
+  });
   it('returns null on unknown hosts', () => {
     expect(getActiveAdapter('example.com')).toBeNull();
   });
@@ -119,6 +122,10 @@ describe('getActiveAdapter host matching', () => {
   it('does not match other google.com subdomains', () => {
     expect(getActiveAdapter('mail.google.com')).toBeNull();
     expect(getActiveAdapter('evilgemini.google.com')).toBeNull();
+  });
+
+  it('rejects a spoofed host that merely ends with deepseek.com', () => {
+    expect(getActiveAdapter('evildeepseek.com')).toBeNull();
   });
 
   it('accepts legitimate subdomains', () => {

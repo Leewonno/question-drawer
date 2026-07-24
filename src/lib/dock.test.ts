@@ -40,6 +40,23 @@ describe('applyDock', () => {
     );
   });
 
+  it("shrinks deepseek's viewport-width flex shell via a stable anchor and a fallback", () => {
+    applyDock(true);
+
+    // jsdom has no layout engine, so this pins the rule's presence only; the
+    // e2e test is what measures that the shell really gets narrower. DeepSeek
+    // has no stable class on the shell, so we target it both by a scoped
+    // structural anchor (the composer <textarea name="search">) and by the
+    // current hashed class as a fallback; min-width is pinned in case DeepSeek
+    // also clamps with min-width: 100vw like gemini.
+    const css = document.getElementById(STYLE_ID)?.textContent ?? '';
+    expect(css).toContain('textarea[name="search"]');
+    expect(css).toContain('.c3ecdb44');
+    expect(css).toContain(
+      `min-width: calc(100vw - ${DRAWER_WIDTH_PX}px) !important`,
+    );
+  });
+
   it("slides gemini's viewport-anchored top bar out from under the drawer", () => {
     applyDock(true);
 

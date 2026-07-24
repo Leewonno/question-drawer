@@ -7,7 +7,7 @@ import { cleanupDock } from '@/src/lib/dock';
 import { loadPretendard } from '@/src/lib/font';
 
 export default defineContentScript({
-  matches: ['*://claude.ai/*', '*://chatgpt.com/*', '*://*.kimi.com/*', '*://gemini.google.com/*'],
+  matches: ['*://claude.ai/*', '*://chatgpt.com/*', '*://*.kimi.com/*', '*://gemini.google.com/*', '*://*.deepseek.com/*'],
   cssInjectionMode: 'ui',
   async main(ctx) {
     const adapter = getActiveAdapter();

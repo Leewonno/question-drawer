@@ -1,6 +1,6 @@
 import { logger } from "./logger";
 
-export type SiteId = "claude" | "chatgpt" | "kimi" | "gemini";
+export type SiteId = "claude" | "chatgpt" | "kimi" | "gemini" | "deepseek";
 
 export interface SiteAdapter {
   id: SiteId;
@@ -172,6 +172,37 @@ const gemini: SiteAdapter = {
     ]),
 };
 
+// DeepSeek. Served from chat.deepseek.com; conversation URLs are
+// /a/chat/s/<id>, handled by the shared conversation.ts pattern. The input is a
+// plain <textarea id="chat-input">; answers render into .ds-markdown.
+// NOTE: getInputBox and isWithinChat selectors are best-effort and should be
+// verified against the live DOM — DeepSeek ships an obfuscated build, so the
+// class-substring matchers may need tightening once inspected on the real page.
+const deepseek: SiteAdapter = {
+  id: "deepseek",
+  getInputBox: () =>
+    firstMatch([
+      "textarea#chat-input",
+      'div[contenteditable="true"]',
+      "textarea",
+    ]),
+  insertPrompt(text) {
+    const box = this.getInputBox();
+    if (!box) {
+      logger.warn("deepseek input box not found");
+      return false;
+    }
+    setText(box, text);
+    return true;
+  },
+  isWithinChat: (node) =>
+    withinAny(node, [
+      '[class*="ds-markdown"]',
+      ".ds-markdown",
+      ".markdown",
+    ]),
+};
+
 export function getActiveAdapter(
   host: string = location.hostname,
 ): SiteAdapter | null {
@@ -179,5 +210,7 @@ export function getActiveAdapter(
   if (host === "chatgpt.com" || host.endsWith(".chatgpt.com")) return chatgpt;
   if (host === "kimi.com" || host.endsWith(".kimi.com")) return kimi;
   if (host === "gemini.google.com") return gemini;
+  if (host === "deepseek.com" || host.endsWith(".deepseek.com"))
+    return deepseek;
   return null;
 }

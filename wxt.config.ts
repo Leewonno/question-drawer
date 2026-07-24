@@ -11,6 +11,7 @@ export default defineConfig({
       "*://chatgpt.com/*",
       "*://*.kimi.com/*",
       "*://gemini.google.com/*",
+      "*://*.deepseek.com/*",
     ],
     // Pretendard is loaded at runtime via a chrome-extension:// URL so it
     // bypasses the host pages' strict `default-src 'none'` CSP. The font must be
@@ -23,6 +24,7 @@ export default defineConfig({
           "*://chatgpt.com/*",
           "*://*.kimi.com/*",
           "*://gemini.google.com/*",
+          "*://*.deepseek.com/*",
         ],
       },
     ],
