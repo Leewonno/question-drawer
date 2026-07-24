@@ -27,6 +27,10 @@ describe('getConversationId', () => {
     expect(getConversationId('https://chat.deepseek.com/a/chat/s/abc-123')).toBe('abc-123');
   });
 
+  it('reads the id from a grok conversation url, ignoring the rid query', () => {
+    expect(getConversationId('https://grok.com/c/abc-123?rid=xyz')).toBe('abc-123');
+  });
+
   it('ignores query strings and hashes', () => {
     expect(getConversationId('https://claude.ai/chat/abc-123?ref=x#top')).toBe('abc-123');
   });

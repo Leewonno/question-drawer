@@ -1,6 +1,12 @@
 import { logger } from "./logger";
 
-export type SiteId = "claude" | "chatgpt" | "kimi" | "gemini" | "deepseek";
+export type SiteId =
+  | "claude"
+  | "chatgpt"
+  | "kimi"
+  | "gemini"
+  | "deepseek"
+  | "grok";
 
 export interface SiteAdapter {
   id: SiteId;
@@ -203,6 +209,36 @@ const deepseek: SiteAdapter = {
     ]),
 };
 
+// Grok (xAI). Served from grok.com; conversation URLs are /c/<id>, handled by
+// the shared conversation.ts pattern. The composer is a plain <textarea>;
+// answers render into a markdown container.
+// NOTE: getInputBox and isWithinChat selectors are best-effort and should be
+// verified against the live DOM — Grok ships an obfuscated build, so the
+// class-substring matchers may need tightening once inspected on the real page.
+const grok: SiteAdapter = {
+  id: "grok",
+  getInputBox: () =>
+    firstMatch([
+      "textarea",
+      'div[contenteditable="true"]',
+    ]),
+  insertPrompt(text) {
+    const box = this.getInputBox();
+    if (!box) {
+      logger.warn("grok input box not found");
+      return false;
+    }
+    setText(box, text);
+    return true;
+  },
+  isWithinChat: (node) =>
+    withinAny(node, [
+      '[class*="message-bubble"]',
+      '[class*="response-content"]',
+      ".markdown",
+    ]),
+};
+
 export function getActiveAdapter(
   host: string = location.hostname,
 ): SiteAdapter | null {
@@ -212,5 +248,6 @@ export function getActiveAdapter(
   if (host === "gemini.google.com") return gemini;
   if (host === "deepseek.com" || host.endsWith(".deepseek.com"))
     return deepseek;
+  if (host === "grok.com" || host.endsWith(".grok.com")) return grok;
   return null;
 }

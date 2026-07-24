@@ -17,6 +17,9 @@ describe('getActiveAdapter', () => {
   it('selects deepseek adapter on chat.deepseek.com', () => {
     expect(getActiveAdapter('chat.deepseek.com')?.id).toBe('deepseek');
   });
+  it('selects grok adapter on grok.com', () => {
+    expect(getActiveAdapter('grok.com')?.id).toBe('grok');
+  });
   it('returns null on unknown hosts', () => {
     expect(getActiveAdapter('example.com')).toBeNull();
   });
@@ -126,6 +129,10 @@ describe('getActiveAdapter host matching', () => {
 
   it('rejects a spoofed host that merely ends with deepseek.com', () => {
     expect(getActiveAdapter('evildeepseek.com')).toBeNull();
+  });
+
+  it('rejects a spoofed host that merely ends with grok.com', () => {
+    expect(getActiveAdapter('evilgrok.com')).toBeNull();
   });
 
   it('accepts legitimate subdomains', () => {

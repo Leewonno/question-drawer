@@ -1,6 +1,7 @@
 // Conversation id lives in the URL path, so it survives reloads and works in
 // any tab: claude.ai/chat/<id>, chatgpt.com/c/<id>, chatgpt.com/g/<gizmo>/c/<id>,
-// kimi.com/chat/<id>, gemini.google.com/app/<id>, deepseek.com/a/chat/s/<id>.
+// kimi.com/chat/<id>, gemini.google.com/app/<id>, deepseek.com/a/chat/s/<id>,
+// grok.com/c/<id> (shares the /c/<id> shape with chatgpt).
 // Matched by path shape only — the host is already narrowed by the content
 // script's match patterns.
 const PATTERNS = [
